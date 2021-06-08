@@ -14,6 +14,7 @@ def effects():
   options = [
     "Point transform",
     "RGB channels", 
+    "Histogram equalization",
     "Thresholding", "Edge detection", 
     "Morphology"
   ]

@@ -6,6 +6,7 @@ import sidebar_menus
 
 import ui.point_transform
 import ui.rgb_channels
+import ui.histogram_equalization
 import ui.thresholding
 import ui.edge_detection
 import ui.morphology
@@ -13,6 +14,7 @@ import ui.morphology
 MODULE_MAP = {
   "Point transform": ui.point_transform,
   "RGB channels": ui.rgb_channels,
+  "Histogram equalization": ui.histogram_equalization,
   "Thresholding": ui.thresholding,
   "Edge detection": ui.edge_detection,
   "Morphology": ui.morphology
