@@ -6,7 +6,7 @@ def inputs():
   return option
 
 def video_inputs():
-  options = ["Upload", "Webcam"]
+  options = ["Webcam", "Upload"]
   option = st.sidebar.selectbox("Video input type", options)
   return option
 
