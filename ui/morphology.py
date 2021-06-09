@@ -1,5 +1,6 @@
 import cv2
 import streamlit as st
+from .utils import display_LR, display_LR_video, get_video_feed
 
 def morphology_menu(container):
   options = [
@@ -35,7 +36,36 @@ def se_menu(container):
   
   return se
 
-def show_image(image):
+MORPHOLOGY_MAP = {
+  "Opening": cv2.MORPH_OPEN,
+  "Closing": cv2.MORPH_CLOSE,
+  "Gradient": cv2.MORPH_GRADIENT,
+  "Black Hat": cv2.MORPH_BLACKHAT,
+  "Top Hat": cv2.MORPH_TOPHAT,
+  "Hit-and-Miss": cv2.MORPH_HITMISS,
+}
+
+
+def get_result(image, method, shape, k_size, force_gray):
+  kernel = cv2.getStructuringElement(shape, (k_size, k_size))
+
+  if force_gray:
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+  result = None
+  if method == "Erosion":
+    result = cv2.erode(image, kernel)
+  elif method == "Dilation":
+    result = cv2.dilate(image, kernel)
+  else:
+    op = MORPHOLOGY_MAP.get(method, None)
+    if op is not None:
+      result = cv2.morphologyEx(image, op, kernel)
+  
+  return result
+
+
+def show_options():
   c1, c2 = st.beta_columns([2, 3])
   method = morphology_menu(c1)
   
@@ -47,44 +77,34 @@ def show_image(image):
     force_gray = True
   else:
     force_gray = c2.checkbox("Convert to grayscale before thresholding")
-    
+
+  return method, shape, k_size, force_gray
+
+
+def show_image(image):
+  method, shape, k_size, force_gray = show_options()
+
   if image is not None:
-    kernel = cv2.getStructuringElement(shape, (k_size, k_size))
+    result = get_result(
+      image, method,
+      shape, k_size,
+      force_gray
+    )
+    display_LR(image, result)
 
-    c1, c2 = st.beta_columns(2)
-    c1.header("Original")
-    c1.image(image)
 
-    if force_gray:
-      image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+def show_video(video):
+  method, shape, k_size, force_gray = show_options()
+  if video is not None:
+    p1, p2 = display_LR_video()
 
-    result = None
-    if method == "Erosion":
-      result = cv2.erode(image, kernel)
-
-    elif method == "Dilation":
-      result = cv2.dilate(image, kernel)
-
-    elif method == "Opening":
-      result = cv2.morphologyEx(image, cv2.MORPH_OPEN, kernel)
-
-    elif method == "Closing":
-      result = cv2.morphologyEx(image, cv2.MORPH_CLOSE, kernel)
-
-    elif method == "Gradient":
-      result = cv2.morphologyEx(image, cv2.MORPH_GRADIENT, kernel)
-
-    elif method == "Black Hat":
-      result = cv2.morphologyEx(image, cv2.MORPH_BLACKHAT, kernel)
-
-    elif method == "Top Hat":
-      result = cv2.morphologyEx(image, cv2.MORPH_TOPHAT, kernel)
-
-    elif method == "Hit-and-Miss":
-      result = cv2.morphologyEx(image, cv2.MORPH_HITMISS, kernel)
-
-    c2.header("Result")
-    if result is not None:
-      c2.image(result)
-    else:
-      c2.title("Unimplemented")
+    while True:
+      video_feed = get_video_feed(video)
+      for frame in video_feed:
+        result = get_result(
+          frame, method,
+          shape, k_size,
+          force_gray 
+        )
+        p1.image(frame)
+        p2.image(result)
