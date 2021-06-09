@@ -46,9 +46,9 @@ def show_video(video):
 
     while True:
       video_feed = get_video_feed(video)
-      
       for frame in video_feed:
         p.image(frame)
+        
         p1.image(_red(frame))
         p2.image(_green(frame))
         p3.image(_blue(frame))

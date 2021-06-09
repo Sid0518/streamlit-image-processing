@@ -85,9 +85,8 @@ def show_options():
 
 
 def show_image(image):
-  method, threshold, force_gray, calc_method = show_options()
-
   if image is not None:
+    method, threshold, force_gray, calc_method = show_options()
     result = get_result(
       image, method, threshold,
       force_gray, calc_method
@@ -96,9 +95,8 @@ def show_image(image):
 
 
 def show_video(video):
-  method, threshold, force_gray, calc_method = show_options()
-
   if video is not None:
+    method, threshold, force_gray, calc_method = show_options()
     p1, p2 = display_LR_video()
 
     while True:

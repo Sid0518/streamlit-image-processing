@@ -100,7 +100,7 @@ def get_result(image, method, low= None, high= None):
   return result
 
 
-def show_image(image):
+def show_options():
   c11, c12 = st.beta_columns([2, 3])
   method = edge_detectors(c11)
 
@@ -108,22 +108,20 @@ def show_image(image):
   if method == "Canny":
     low, high = c12.slider('Set threshold range', 0, 255, (75, 165))
 
+  return method, low, high
+
+def show_image(image):
   if image is not None:
+    method, low, high = show_options()
     result = get_result(image, method, low, high)
     display_LR(image, result)
 
 
 def show_video(video):
-  c11, c12 = st.beta_columns([2, 3])
-  method = edge_detectors(c11)
-
-  low, high = None, None
-  if method == "Canny":
-    low, high = c12.slider('Set threshold range', 0, 255, (75, 165))
-
   if video is not None:
+    method, low, high = show_options()
+    
     p1, p2 = display_LR_video()
-
     while True:
       video_feed = get_video_feed(video)
       for frame in video_feed:

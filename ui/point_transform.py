@@ -17,6 +17,7 @@ def point_transform_menu(container):
   container.write(
     """
       <style>
+        div.element-container:nth-child(4) > div:nth-child(1) > div:nth-child(2),
         div.element-container:nth-child(5) > div:nth-child(1) > div:nth-child(2) {
           flex-direction: row;
         }
@@ -44,16 +45,15 @@ def get_result(image, transform):
 
 
 def show_image(image):
-  transform = point_transform_menu(st)
-
   if image is not None:
+    transform = point_transform_menu(st)
     result = get_result(image, transform)
     display_LR(image, result)
 
 
 def show_video(video):
-  transform = point_transform_menu(st)
   if video is not None:
+    transform = point_transform_menu(st)
     p1, p2 = display_LR_video()
 
     while True:

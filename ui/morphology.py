@@ -82,9 +82,8 @@ def show_options():
 
 
 def show_image(image):
-  method, shape, k_size, force_gray = show_options()
-
   if image is not None:
+    method, shape, k_size, force_gray = show_options()
     result = get_result(
       image, method,
       shape, k_size,
@@ -94,10 +93,10 @@ def show_image(image):
 
 
 def show_video(video):
-  method, shape, k_size, force_gray = show_options()
   if video is not None:
+    method, shape, k_size, force_gray = show_options()
+    
     p1, p2 = display_LR_video()
-
     while True:
       video_feed = get_video_feed(video)
       for frame in video_feed:
