@@ -2,6 +2,9 @@ import cv2
 import numpy as np
 from scipy.signal import convolve2d
 import streamlit as st
+import time
+
+from .utils import display_LR, display_LR_video, get_video_feed
 
 class Sobel:
   x = np.array((
@@ -80,30 +83,50 @@ def laplacian(image):
   grad = np.clip(grad, 0, 255).astype(np.uint8)
   return grad
 
+
+def get_result(image, method, low= None, high= None):
+  result = None
+  if method == "Sobel":
+    result = detect_edges(image, Sobel)
+  elif method == "Prewitt":
+    result = detect_edges(image, Prewitt)
+  elif method == "Scharr":
+    result = detect_edges(image, Scharr)
+  elif method == "Laplacian":
+    result = laplacian(image)
+  elif method == "Canny":
+    result = cv2.Canny(image, low, high)
+
+  return result
+
+
 def show_image(image):
   c11, c12 = st.beta_columns([2, 3])
   method = edge_detectors(c11)
 
+  low, high = None, None
+  if method == "Canny":
+    low, high = c12.slider('Set threshold range', 0, 255, (75, 165))
+
   if image is not None:
-    c1, c2 = st.beta_columns(2)
-    c1.header("Original")
-    c1.image(image)
+    result = get_result(image, method, low, high)
+    display_LR(image, result)
 
-    result = None
-    if method == "Sobel":
-      result = detect_edges(image, Sobel)
-    elif method == "Prewitt":
-      result = detect_edges(image, Prewitt)
-    elif method == "Scharr":
-      result = detect_edges(image, Scharr)
-    elif method == "Laplacian":
-      result = laplacian(image)
-    elif method == "Canny":
-      low, high = c12.slider('Set threshold range', 0, 255, (75, 165))
-      result = cv2.Canny(image, low, high)
 
-    c2.header("Result")
-    if result is not None:
-      c2.image(result)
-    else:
-      c2.title("Unimplemented")
+def show_video(video):
+  c11, c12 = st.beta_columns([2, 3])
+  method = edge_detectors(c11)
+
+  low, high = None, None
+  if method == "Canny":
+    low, high = c12.slider('Set threshold range', 0, 255, (75, 165))
+
+  if video is not None:
+    p1, p2 = display_LR_video()
+
+    while True:
+      video_feed = get_video_feed(video)
+      for frame in video_feed:
+        result = get_result(frame, method, low, high)
+        p1.image(frame)
+        p2.image(result)
