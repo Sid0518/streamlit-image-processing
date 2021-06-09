@@ -1,9 +1,25 @@
-import streamlit as st
+import cv2
 import numpy as np
 from PIL import Image
+import streamlit as st
+
+#---------------------------------------------------------------#
+  # Setup temporary directory for video upload
+import os
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+tmpdir = os.path.join(ROOT_DIR, "temp")
+if not os.path.isdir(tmpdir):
+  os.mkdir(tmpdir)
+  
+for tmpfile in os.listdir(os.path.join(os.getcwd(), "temp")):
+  os.unlink(os.path.join(tmpdir, tmpfile))
+  
+import tempfile
+tempfile.tempdir = tmpdir
+#---------------------------------------------------------------#
 
 import sidebar_menus
-
 import ui.point_transform
 import ui.rgb_channels
 import ui.histogram_equalization
@@ -37,10 +53,15 @@ elif input_type == "Video":
   video_type = sidebar_menus.video_inputs()
   
   if video_type == "Upload":
-    video = st.file_uploader("Upload an image", type= ["mp4"])
+    f = st.file_uploader("Upload an image", type= ["mp4"])
+    if f is not None:
+      tfile = tempfile.NamedTemporaryFile(delete= False)
+      tfile.write(f.read())
+      tfile.close()
+      video = tfile.name
+
   elif video_type == "Webcam":
-    video = None
-  st.header(type(video))
+    video = cv2.CAP_DSHOW
 #----------------------------------------------------------------------------------#
 
 # Show the radio buttons to select from the various image processing methods
@@ -52,4 +73,4 @@ if effect_module is not None:
   if input_type == "Image":
     effect_module.show_image(image)
   elif input_type == "Video":
-    effect_module.show_video(video, video_type)
+    effect_module.show_video(video)
