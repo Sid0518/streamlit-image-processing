@@ -1,6 +1,8 @@
 import cv2
 import streamlit as st
 
+from .utils import display_LR, display_LR_video, get_video_feed
+
 #-------------------------------------------------------------#
   # Thresholding methods
 METHOD_MAP = {
@@ -22,11 +24,11 @@ def thresholding_menu(container):
 
 #-----------------------------------------------------------------------#
   # Automatic threshold calculation methods
-CALCULATION_METHOD_MAP = {
+CALC_MAP = {
   "Otsu": cv2.THRESH_OTSU,
   "Triangle": cv2.THRESH_TRIANGLE
 }
-def threshold_calculation_menu(container):
+def threshold_calc_menu(container):
   container.write(
     """
       <style>
@@ -49,7 +51,7 @@ def threshold_calculation_menu(container):
 
 def get_result(
   image, method, threshold, 
-  force_gray, calculation_method
+  force_gray, calc_method
 ):
   if threshold:
     if force_gray:
@@ -57,12 +59,12 @@ def get_result(
     _, result = cv2.threshold(image, threshold, 255, method)
   else:
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    _, result = cv2.threshold(gray, 0, 255, method + calculation_method)
+    _, result = cv2.threshold(gray, 0, 255, method + calc_method)
 
   return result
 
 
-def show_image(image):
+def show_options():
   c1, c2 = st.beta_columns([2, 3])
   
   method_id = thresholding_menu(c1)
@@ -72,21 +74,39 @@ def show_image(image):
   if threshold_provided:
     threshold = c2.slider('Set threshold value', 0, 255, 127)
     force_gray = c2.checkbox("Convert to grayscale before thresholding")
-    calculation_method = None
+    calc_method = None
   else:
     threshold = None
-    force_gray = None
-    method_id = threshold_calculation_menu(c2)
-    calculation_method = CALCULATION_METHOD_MAP[method_id]
+    force_gray = False
+    method_id = threshold_calc_menu(c2)
+    calc_method = CALC_MAP[method_id]
+
+  return method, threshold, force_gray, calc_method
+
+
+def show_image(image):
+  method, threshold, force_gray, calc_method = show_options()
 
   if image is not None:
-    c1, c2 = st.beta_columns(2)
-    c1.header("Original")
-    c1.image(image)
-    
     result = get_result(
       image, method, threshold,
-      force_gray, calculation_method
+      force_gray, calc_method
     )
-    c2.header("Result")
-    c2.image(result)
+    display_LR(image, result)
+
+
+def show_video(video):
+  method, threshold, force_gray, calc_method = show_options()
+
+  if video is not None:
+    p1, p2 = display_LR_video()
+
+    while True:
+      video_feed = get_video_feed(video)
+      for frame in video_feed:
+        result = get_result(
+          frame, method, threshold,
+          force_gray, calc_method
+        )
+        p1.image(frame)
+        p2.image(result)
