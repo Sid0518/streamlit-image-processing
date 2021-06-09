@@ -24,6 +24,7 @@ def se_menu(container):
       <style>
         .css-17alyy9 > div:nth-child(1) > div:nth-child(2) > div:nth-child(1) > div:nth-child(2) {
           flex-direction: row;
+          justify-content: space-around;
         }
       </style>
     """, 

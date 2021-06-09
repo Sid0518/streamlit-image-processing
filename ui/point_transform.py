@@ -20,6 +20,7 @@ def point_transform_menu(container):
         div.element-container:nth-child(4) > div:nth-child(1) > div:nth-child(2),
         div.element-container:nth-child(5) > div:nth-child(1) > div:nth-child(2) {
           flex-direction: row;
+          justify-content: space-around;
         }
       </style>
     """, 

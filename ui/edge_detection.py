@@ -59,6 +59,18 @@ class Scharr:
   ), dtype = 'int')
 
 def edge_detectors(container):
+  container.write(
+    """
+      <style>
+        div.element-container:nth-child(4) > div:nth-child(1) > div:nth-child(2),
+        div.element-container:nth-child(5) > div:nth-child(1) > div:nth-child(2) {
+          flex-direction: row;
+          justify-content: space-around;
+        }
+      </style>
+    """,
+    unsafe_allow_html= True
+  )
   options = [
     "Sobel", "Prewitt", "Scharr",
     "Laplacian", "Canny"
@@ -101,12 +113,11 @@ def get_result(image, method, low= None, high= None):
 
 
 def show_options():
-  c11, c12 = st.beta_columns([2, 3])
-  method = edge_detectors(c11)
+  method = edge_detectors(st)
 
   low, high = None, None
   if method == "Canny":
-    low, high = c12.slider('Set threshold range', 0, 255, (75, 165))
+    low, high = st.slider('Set threshold range', 0, 255, (75, 165))
 
   return method, low, high
 
