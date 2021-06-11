@@ -42,7 +42,13 @@ header = st.empty()
 subheader = st.empty()
 #---------------------------------------------------------------------------------#
   # Select the input type from the video
-input_type = sidebar_menus.inputs()
+
+
+# Currently input type has been disabled, since the
+# deployed app cannot work with the webcam
+# input_type = sidebar_menus.inputs()
+input_type = "Image"
+
 if input_type == "Image":
   f = st.file_uploader("Upload an image", type= ["png", "jpg", "jpeg", "webp"])
   if f is not None:
