@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-from scipy.signal import convolve2d
 import streamlit as st
 import time
 
@@ -81,8 +80,8 @@ def edge_detectors(container):
 def detect_edges(image, kernel):
   gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     
-  grad_x = convolve2d(gray, kernel.x, mode = 'same')
-  grad_y = convolve2d(gray, kernel.y, mode = 'same')
+  grad_x = cv2.filter2D(gray, -1, kernel.x)
+  grad_y = cv2.filter2D(gray, -1, kernel.y)
 
   grad = np.abs(grad_x) + np.abs(grad_y)
   grad = np.clip(grad, 0, 255).astype(np.uint8)
@@ -94,7 +93,6 @@ def laplacian(image):
 
   grad = np.clip(grad, 0, 255).astype(np.uint8)
   return grad
-
 
 def get_result(image, method, low= None, high= None):
   result = None
